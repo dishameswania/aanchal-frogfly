@@ -37,9 +37,9 @@ jobs:
         run: go test -v ./... || true
       
       - name: Build Docker image
-        run: docker build -t supportfly.jfrog.io/dishameswania/aanchal-frogfly:${{ github.sha }} -t supportfly.jfrog.io/dishameswania/aanchal-frogfly:latest .
+        run: docker build -t supportfly.jfrog.io/docker/aanchal-frogfly:${{ github.sha }} -t supportfly.jfrog.io/docker/aanchal-frogfly:latest .
       
       - name: Publish to JFrog Fly
         run: |
-          docker push supportfly.jfrog.io/dishameswania/aanchal-frogfly:${{ github.sha }}
-          docker push supportfly.jfrog.io/dishameswania/aanchal-frogfly:latest
+          docker push supportfly.jfrog.io/docker/aanchal-frogfly:${{ github.sha }}
+          docker push supportfly.jfrog.io/docker/aanchal-frogfly:latest

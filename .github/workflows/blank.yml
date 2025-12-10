@@ -1,0 +1,29 @@
+name: Go CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.21'
+      - name: JFrog Fly - Configure all your package managers to work with Fly registry
+        uses: jfrog/fly-action@v1
+        with:
+          url: https://supportfly.jfrog.io
+      - name: Build
+        run: go build ./...
+      - name: Publish
+        run: go install ./...

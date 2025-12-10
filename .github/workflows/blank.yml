@@ -13,7 +13,6 @@ jobs:
     permissions:
       contents: read
       id-token: write
-      packages: write
     steps:
       - uses: actions/checkout@v4
       - name: Setup Go
@@ -24,16 +23,9 @@ jobs:
         uses: jfrog/fly-action@v1
         with:
           url: https://supportfly.jfrog.io
-      - name: Tidy modules
-        run: go mod tidy
-      - name: Build Go
+      - name: Build
         run: go build -v ./...
       - name: Test
         run: go test -v ./... || true
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and Push Docker image
-        run: |
-          docker build -t supportfly.jfrog.io/aanchal-frogfly:${{ github.sha }} -t supportfly.jfrog.io/aanchal-frogfly:latest .
-          docker push supportfly.jfrog.io/aanchal-frogfly:${{ github.sha }}
-          docker push supportfly.jfrog.io/aanchal-frogfly:latest
+      - name: Publish
+        run: go install ./...

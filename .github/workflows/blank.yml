@@ -23,7 +23,13 @@ jobs:
         uses: jfrog/fly-action@v1
         with:
           url: https://supportfly.jfrog.io
+      - name: Download dependencies
+        run: go mod download
       - name: Build
-        run: go build ./...
-      - name: Publish
+        run: go build -v ./...
+      - name: Install
         run: go install ./...
+      - name: Publish to JFrog Fly
+        run: |
+          go mod tidy
+          GOPROXY=https://supportfly.jfrog.io/go go list -m github.com/${{ github.repository }}@${{ github.ref_name }}

@@ -1,4 +1,4 @@
-name: Go CI
+name: Go Build and Publish
 
 on:
   push:
@@ -8,24 +8,38 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
+    
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
           go-version: '1.21'
-      - name: JFrog Fly - Configure all your package managers to work with Fly registry
+      
+      - name: Configure JFrog Fly
         uses: jfrog/fly-action@v1
         with:
           url: https://supportfly.jfrog.io
-      - name: Build
-        run: go build -v ./...
-      - name: Test
+      
+      - name: Build Go project
+        run: |
+          go mod tidy
+          go build -v -o aanchal-frogfly ./...
+      
+      - name: Run tests
         run: go test -v ./... || true
-      - name: Publish
-        run: go install ./...
+      
+      - name: Build Docker image
+        run: docker build -t supportfly.jfrog.io/dishameswania/aanchal-frogfly:${{ github.sha }} -t supportfly.jfrog.io/dishameswania/aanchal-frogfly:latest .
+      
+      - name: Publish to JFrog Fly
+        run: |
+          docker push supportfly.jfrog.io/dishameswania/aanchal-frogfly:${{ github.sha }}
+          docker push supportfly.jfrog.io/dishameswania/aanchal-frogfly:latest
